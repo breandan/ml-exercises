@@ -1,50 +1,64 @@
-import random
-
+import pylab as pl
 import numpy as np
 from scipy.spatial import distance
+from sklearn.datasets.samples_generator import make_blobs
 
-def kMeans(dataSet, k, maxIt):
-    numPoints, numDim = dataSet.shape
-    dsLabeled = np.zeros((numPoints, numDim + 1))
-    dsLabeled[:, : -1] = dataSet
 
-    centroids = dsLabeled[np.random.choice(len(dsLabeled), k, replace=False)]
-    centroids[:, -1] = range(1, k + 1) # Assign labels
+def k_means(dataset, k, max_it=1000):
+    labeled_ds = np.append(dataset, np.zeros((len(dataset), 1)), axis=1)
 
-    currentIt = 0
-    old_centroids = None
+    centers = labeled_ds[np.random.choice(len(labeled_ds), k, replace=False)]
+    centers[:, -1] = range(1, k + 1)  # Assign labels
 
-    while currentIt < maxIt and not np.array_equal(old_centroids, centroids):
-        currentIt += 1
-        old_centroids = np.copy(centroids)
-        relabel(dsLabeled, centroids)
-        centroids = get_centroids(dsLabeled, k)
+    current_it = 0
+    old_centers = None
 
-    return dsLabeled
+    while current_it < max_it and not np.array_equal(old_centers, centers):
+        current_it += 1
+        old_centers = np.copy(centers)
+        update_labels(labeled_ds, centers)
+        update_centers(labeled_ds, centers)
 
-def relabel(dataSet, centroids):
+    return labeled_ds
+
+
+def update_labels(dataSet, centers):
     for datum in dataSet:
-        datum[-1] = centroids[0, -1]
-        minDist = distance.euclidean(datum[:-1], centroids[0, :-1])
-        for centroid in centroids:
-            dist = distance.euclidean(datum[:-1], centroid[:-1])
+        datum[-1] = centers[0, -1]
+        minDist = distance.euclidean(datum[:-1], centers[0, :-1])
+        for center in centers:
+            dist = distance.euclidean(datum[:-1], center[:-1])
             if dist < minDist:
                 minDist = dist
-                datum[-1] = centroid[-1]
+                datum[-1] = center[-1]
 
-def get_centroids(dataSet, k):
-    result = np.zeros((k, dataSet.shape[1]))
+
+def update_centers(dataSet, centers):
+    k = len(centers)
     for i in range(1, k + 1):
         cluster = dataSet[dataSet[:, -1] == i, :-1]
-        result[i - 1, :-1] = np.mean(cluster, axis=0)
-        result[i - 1, -1] = i
+        centers[i - 1, :-1] = np.mean(cluster, axis=0)
+        centers[i - 1, -1] = i
 
-    return result
 
-X = np.matrix([[2, 1, 9],
-               [1, 2, 1],
-               [4, 5, 1],
-               [5, 4, 9]])
 
-result = kMeans(X, 2, 10)
-print(result)
+centers = [[-1, -1], [0, 1], [1, -1]]
+X, _ = make_blobs(n_samples=1000, centers=centers, cluster_std=0.4)
+result = k_means(X, 3)
+
+pl.figure(1)
+pl.clf()
+for datum in result:
+        pl.plot(datum[0], datum[1], 'k.')
+pl.show()
+
+pl.figure(2)
+pl.clf()
+for datum in result:
+    if datum[-1] == 1:
+        pl.plot(datum[0], datum[1], 'r.')
+    elif datum[-1] == 2:
+        pl.plot(datum[0], datum[1], 'b.')
+    elif datum[-1] == 3:
+        pl.plot(datum[0], datum[1], 'g.')
+pl.show()
