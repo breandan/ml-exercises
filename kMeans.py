@@ -14,16 +14,16 @@ def k_means(dataset, k, max_it=1000):
     old_centers = None
 
     while current_it < max_it and not np.array_equal(old_centers, centers):
-        current_it += 1
         old_centers = np.copy(centers)
         update_labels(labeled_ds, centers)
         update_centers(labeled_ds, centers)
+        current_it += 1
 
     return labeled_ds
 
 
-def update_labels(dataSet, centers):
-    for datum in dataSet:
+def update_labels(dataset, centers):
+    for datum in dataset:
         datum[-1] = centers[0, -1]
         minDist = distance.euclidean(datum[:-1], centers[0, :-1])
         for center in centers:
@@ -33,24 +33,18 @@ def update_labels(dataSet, centers):
                 datum[-1] = center[-1]
 
 
-def update_centers(dataSet, centers):
+def update_centers(dataset, centers):
     k = len(centers)
     for i in range(1, k + 1):
-        cluster = dataSet[dataSet[:, -1] == i, :-1]
+        cluster = dataset[dataset[:, -1] == i, :-1]
         centers[i - 1, :-1] = np.mean(cluster, axis=0)
         centers[i - 1, -1] = i
 
 
-
-centers = [[-1, -1], [0, 1], [1, -1]]
-X, _ = make_blobs(n_samples=1000, centers=centers, cluster_std=0.4)
-result = k_means(X, 3)
-
-pl.figure(1)
-pl.clf()
-for datum in result:
-        pl.plot(datum[0], datum[1], 'k.')
-pl.show()
+random_points, _ = make_blobs(n_samples=4000,
+                              centers=[[-1, -1], [0, 1], [1, -1]],
+                              cluster_std=0.5)
+result = k_means(random_points, 3)
 
 pl.figure(2)
 pl.clf()

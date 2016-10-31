@@ -1,5 +1,3 @@
-print(__doc__)
-
 from time import time
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,13 +19,21 @@ labels = digits.target
 
 sample_size = 300
 
+sample_image = digits.images[0]
+print(sample_image)
+print(data[0])
+input()
+arr = np.asarray(sample_image)
+plt.axis('off')
+plt.imshow(arr, cmap='Greys', interpolation='nearest')
+plt.show()
+
 print("n_digits: %d, \t n_samples %d, \t n_features %d"
       % (n_digits, n_samples, n_features))
 
-
-print(79 * '_')
+print(80 * '_')
 print('% 9s' % 'init'
-      '    time  inertia    homo   compl  v-meas     ARI AMI  silhouette')
+               '        time     inertia homo    compl   v-meas   ARI     AMI   silhouette')
 
 
 def bench_k_means(estimator, name, data):
@@ -39,10 +45,11 @@ def bench_k_means(estimator, name, data):
              metrics.completeness_score(labels, estimator.labels_),
              metrics.v_measure_score(labels, estimator.labels_),
              metrics.adjusted_rand_score(labels, estimator.labels_),
-             metrics.adjusted_mutual_info_score(labels,  estimator.labels_),
+             metrics.adjusted_mutual_info_score(labels, estimator.labels_),
              metrics.silhouette_score(data, estimator.labels_,
                                       metric='euclidean',
                                       sample_size=sample_size)))
+
 
 bench_k_means(KMeans(init='k-means++', n_clusters=n_digits, n_init=10),
               name="k-means++", data=data)
@@ -54,18 +61,15 @@ bench_k_means(KMeans(init='random', n_clusters=n_digits, n_init=10),
 # kmeans algorithm only once with n_init=1
 pca = PCA(n_components=n_digits).fit(data)
 bench_k_means(KMeans(init=pca.components_, n_clusters=n_digits, n_init=1),
-              name="PCA-based",
-              data=data)
-print(79 * '_')
-
-
+              name="PCA-based", data=data)
+print(80 * '_')
 
 reduced_data = PCA(n_components=2).fit_transform(data)
 kmeans = KMeans(init='k-means++', n_clusters=n_digits, n_init=10)
 kmeans.fit(reduced_data)
 
 # Step size of the mesh. Decrease to increase the quality of the VQ.
-h = .02     # point in the mesh [x_min, x_max]x[y_min, y_max].
+h = .02  # point in the mesh [x_min, x_max]x[y_min, y_max].
 
 # Plot the decision boundary. For that, we will assign a color to each
 x_min, x_max = reduced_data[:, 0].min() - 1, reduced_data[:, 0].max() + 1
@@ -90,8 +94,6 @@ centroids = kmeans.cluster_centers_
 plt.scatter(centroids[:, 0], centroids[:, 1],
             marker='x', s=169, linewidths=3,
             color='w', zorder=10)
-plt.title('K-means clustering on the digits dataset (PCA-reduced data)\n'
-          'Centroids are marked with white cross')
 plt.xlim(x_min, x_max)
 plt.ylim(y_min, y_max)
 plt.xticks(())
