@@ -53,8 +53,7 @@ with tf.Session() as sess:
         for i in range(total_batch):
             batch_xs, batch_ys = mnist.train.next_batch(batch_size)
             # Run optimization op (backprop) and cost op (to get loss value)
-            _, c = sess.run([optimizer, cost], feed_dict={x: batch_xs,
-                                                          y: batch_ys})
+            _, c = sess.run([optimizer, cost], feed_dict={x: batch_xs, y: batch_ys})
             # Compute average loss
             avg_cost += c / total_batch
         # Display logs per epoch step
@@ -70,8 +69,6 @@ with tf.Session() as sess:
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
     print("Accuracy:", accuracy.eval({x: mnist.test.images, y: mnist.test.labels}))
 
-saver = tf.train.Saver()
-saver.save(sess, "/tmp/model.ckpt")
 with tf.Session() as sess:
     saver.restore(sess, "/tmp/model.ckpt")
     print("Model restored from file")
