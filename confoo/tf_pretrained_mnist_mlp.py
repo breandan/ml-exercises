@@ -20,7 +20,6 @@ n_classes = 10  # MNIST total classes (0-9 digits)
 x = tf.placeholder("float", [None, n_input])
 y = tf.placeholder("float", [None, n_classes])
 
-
 # Create model
 def multilayer_perceptron(x, weights, biases):
     # Hidden layer with RELU activation
