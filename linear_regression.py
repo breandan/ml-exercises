@@ -6,12 +6,12 @@ x_train = np.linspace(-1, 1, 100)
 y_train = 2 * x_train + np.random.randn(100) * 0.25
 
 weight = tf.Variable(0.0)
+b = tf.Variable(0.0)
 
 X = tf.placeholder("float")
 Y = tf.placeholder("float")
 
-y_model = tf.multiply(X, weight)
-
+y_model = tf.add(tf.multiply(X, weight), b)
 loss = tf.square(Y - y_model)
 training_op = tf.train.GradientDescentOptimizer(0.01).minimize(loss)
 
@@ -22,7 +22,9 @@ for i in range(100):
     for (x, y) in zip(x_train, y_train):
         sess.run(training_op, feed_dict={X: x, Y: y})
     prediction = sess.run(weight)
-    print(prediction)
+    # print(prediction)
+    print("Slope: " + str(weight.eval(sess)) + ", B: "+ str(b.eval(sess)))
+    print()
 
 sess.close()
 
