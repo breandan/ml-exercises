@@ -10,7 +10,7 @@ weight = tf.Variable(0.0)
 X = tf.placeholder("float")
 Y = tf.placeholder("float")
 
-y_model = tf.mul(X, weight)
+y_model = tf.multiply(X, weight)
 
 loss = tf.square(Y - y_model)
 training_op = tf.train.GradientDescentOptimizer(0.01).minimize(loss)
